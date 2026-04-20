@@ -288,11 +288,11 @@
       <div class="field">
         <label>여행 유형 <span class="req">*</span></label>
         <div class="chip-group" id="travelTypeGroup">
-          <label class="chip" onclick="selectChip(this,'travelType')"><input type="radio" name="travelType" value="혼자 여행 (1인)" />🙋 혼자</label>
-          <label class="chip" onclick="selectChip(this,'travelType')"><input type="radio" name="travelType" value="커플 여행 (2인)" />💑 커플</label>
-          <label class="chip" onclick="selectChip(this,'travelType')"><input type="radio" name="travelType" value="가족 여행" />👨‍👩‍👧 가족</label>
-          <label class="chip" onclick="selectChip(this,'travelType')"><input type="radio" name="travelType" value="친구 여행" />👫 친구</label>
-          <label class="chip" onclick="selectChip(this,'travelType')"><input type="radio" name="travelType" value="단체 여행" />👥 단체</label>
+          <label class="chip" onclick="selectChip(this,'travelType',event)"><input type="radio" name="travelType" value="혼자 여행 (1인)" />🙋 혼자</label>
+          <label class="chip" onclick="selectChip(this,'travelType',event)"><input type="radio" name="travelType" value="커플 여행 (2인)" />💑 커플</label>
+          <label class="chip" onclick="selectChip(this,'travelType',event)"><input type="radio" name="travelType" value="가족 여행" />👨‍👩‍👧 가족</label>
+          <label class="chip" onclick="selectChip(this,'travelType',event)"><input type="radio" name="travelType" value="친구 여행" />👫 친구</label>
+          <label class="chip" onclick="selectChip(this,'travelType',event)"><input type="radio" name="travelType" value="단체 여행" />👥 단체</label>
         </div>
       </div>
 
@@ -332,9 +332,9 @@
       <div class="field" id="elderlyField" style="display:none">
         <label>어르신 동반 <span class="hint">(만 65세 이상)</span></label>
         <div class="chip-group" id="elderlyGroup">
-          <label class="chip" onclick="selectChip(this,'elderly')"><input type="radio" name="elderly" value="없음" checked />없음</label>
-          <label class="chip" onclick="selectChip(this,'elderly')"><input type="radio" name="elderly" value="1명" />1명</label>
-          <label class="chip" onclick="selectChip(this,'elderly')"><input type="radio" name="elderly" value="2명 이상" />2명 이상</label>
+          <label class="chip" onclick="selectChip(this,'elderly',event)"><input type="radio" name="elderly" value="없음" checked />없음</label>
+          <label class="chip" onclick="selectChip(this,'elderly',event)"><input type="radio" name="elderly" value="1명" />1명</label>
+          <label class="chip" onclick="selectChip(this,'elderly',event)"><input type="radio" name="elderly" value="2명 이상" />2명 이상</label>
         </div>
       </div>
     </div>
@@ -352,36 +352,36 @@
       <div class="field">
         <label>선호 여행 스타일 <span class="req">*</span><span class="hint">(1~3개 선택)</span></label>
         <div class="chip-group">
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🏛️ 문화·역사 탐방" />🏛️ 문화·역사</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🍽️ 미식·맛집" />🍽️ 미식·맛집</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🛍️ 쇼핑" />🛍️ 쇼핑</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🎢 테마파크·액티비티" />🎢 테마파크</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🌿 자연·힐링" />🌿 자연·힐링</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="📸 사진·인스타" />📸 포토스팟</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🎭 공연·예술" />🎭 공연·예술</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🏄 스포츠·어드벤처" />🏄 어드벤처</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="😌 휴양·리조트" />😌 휴양</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🎓 학습·체험" />🎓 체험·교육</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="style" value="🏛️ 문화·역사 탐방" />🏛️ 문화·역사</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="style" value="🍽️ 미식·맛집" />🍽️ 미식·맛집</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="style" value="🛍️ 쇼핑" />🛍️ 쇼핑</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="style" value="🎢 테마파크·액티비티" />🎢 테마파크</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="style" value="🌿 자연·힐링" />🌿 자연·힐링</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="style" value="📸 사진·인스타" />📸 포토스팟</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="style" value="🎭 공연·예술" />🎭 공연·예술</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="style" value="🏄 스포츠·어드벤처" />🏄 어드벤처</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="style" value="😌 휴양·리조트" />😌 휴양</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="style" value="🎓 학습·체험" />🎓 체험·교육</label>
         </div>
       </div>
 
       <div class="field">
         <label>여행 페이스 <span class="req">*</span></label>
         <div class="chip-group" id="paceGroup">
-          <label class="chip" onclick="selectChip(this,'pace')"><input type="radio" name="pace" value="느긋하게 (하루 1~2곳)" />🐢 느긋하게</label>
-          <label class="chip" onclick="selectChip(this,'pace')"><input type="radio" name="pace" value="보통 (하루 3~4곳)" />🚶 보통</label>
-          <label class="chip" onclick="selectChip(this,'pace')"><input type="radio" name="pace" value="알차게 (하루 5곳 이상)" />🏃 알차게</label>
+          <label class="chip" onclick="selectChip(this,'pace',event)"><input type="radio" name="pace" value="느긋하게 (하루 1~2곳)" />🐢 느긋하게</label>
+          <label class="chip" onclick="selectChip(this,'pace',event)"><input type="radio" name="pace" value="보통 (하루 3~4곳)" />🚶 보통</label>
+          <label class="chip" onclick="selectChip(this,'pace',event)"><input type="radio" name="pace" value="알차게 (하루 5곳 이상)" />🏃 알차게</label>
         </div>
       </div>
 
       <div class="field">
         <label>숙소 유형 <span class="req">*</span></label>
         <div class="chip-group" id="accGroup">
-          <label class="chip" onclick="selectChip(this,'acc')"><input type="radio" name="acc" value="호텔 (비즈니스급)" />🏨 비즈니스호텔</label>
-          <label class="chip" onclick="selectChip(this,'acc')"><input type="radio" name="acc" value="호텔 (리조트·4성급 이상)" />⭐ 리조트·특급</label>
-          <label class="chip" onclick="selectChip(this,'acc')"><input type="radio" name="acc" value="에어비앤비·아파트먼트" />🏠 에어비앤비</label>
-          <label class="chip" onclick="selectChip(this,'acc')"><input type="radio" name="acc" value="게스트하우스·호스텔" />🛏️ 게스트하우스</label>
-          <label class="chip" onclick="selectChip(this,'acc')"><input type="radio" name="acc" value="상관없음 (최적 추천)" />🤔 추천받기</label>
+          <label class="chip" onclick="selectChip(this,'acc',event)"><input type="radio" name="acc" value="호텔 (비즈니스급)" />🏨 비즈니스호텔</label>
+          <label class="chip" onclick="selectChip(this,'acc',event)"><input type="radio" name="acc" value="호텔 (리조트·4성급 이상)" />⭐ 리조트·특급</label>
+          <label class="chip" onclick="selectChip(this,'acc',event)"><input type="radio" name="acc" value="에어비앤비·아파트먼트" />🏠 에어비앤비</label>
+          <label class="chip" onclick="selectChip(this,'acc',event)"><input type="radio" name="acc" value="게스트하우스·호스텔" />🛏️ 게스트하우스</label>
+          <label class="chip" onclick="selectChip(this,'acc',event)"><input type="radio" name="acc" value="상관없음 (최적 추천)" />🤔 추천받기</label>
         </div>
       </div>
     </div>
@@ -430,19 +430,19 @@
       <div class="field">
         <label>예산 수준 <span class="req">*</span></label>
         <div class="budget-cards">
-          <label class="budget-card" onclick="selectBudget(this)">
+          <label class="budget-card" onclick="selectBudget(this,event)">
             <input type="radio" name="budget" value="절약형" />
             <div class="budget-icon">💚</div>
             <div class="budget-name">절약형</div>
             <div class="budget-range">가성비 최우선</div>
           </label>
-          <label class="budget-card" onclick="selectBudget(this)">
+          <label class="budget-card" onclick="selectBudget(this,event)">
             <input type="radio" name="budget" value="보통형" />
             <div class="budget-icon">💛</div>
             <div class="budget-name">보통형</div>
             <div class="budget-range">합리적 소비</div>
           </label>
-          <label class="budget-card" onclick="selectBudget(this)">
+          <label class="budget-card" onclick="selectBudget(this,event)">
             <input type="radio" name="budget" value="럭셔리형" />
             <div class="budget-icon">💜</div>
             <div class="budget-name">럭셔리형</div>
@@ -470,14 +470,14 @@
       <div class="field">
         <label>특별 고려 사항 <span class="hint">(복수 선택 가능)</span></label>
         <div class="chip-group">
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="유모차 이동 가능한 동선" />🍼 유모차 동선</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="어르신 보행 편의 고려" />🧓 어르신 배려</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="채식·비건 식단 필요" />🥗 채식/비건</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="할랄 식단 필요" />🌙 할랄 식단</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="글루텐 프리 필요" />🌾 글루텐 프리</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="반려동물 동반" />🐾 반려동물</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="휠체어·장애인 편의시설 필요" />♿ 접근성</label>
-          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="허니문·기념일 여행" />💍 허니문</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="special" value="유모차 이동 가능한 동선" />🍼 유모차 동선</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="special" value="어르신 보행 편의 고려" />🧓 어르신 배려</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="special" value="채식·비건 식단 필요" />🥗 채식/비건</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="special" value="할랄 식단 필요" />🌙 할랄 식단</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="special" value="글루텐 프리 필요" />🌾 글루텐 프리</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="special" value="반려동물 동반" />🐾 반려동물</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="special" value="휠체어·장애인 편의시설 필요" />♿ 접근성</label>
+          <label class="chip" onclick="toggleChip(this,event)"><input type="checkbox" name="special" value="허니문·기념일 여행" />💍 허니문</label>
         </div>
       </div>
 
@@ -522,20 +522,24 @@
     document.getElementById(type + '-val').textContent = counts[type];
   }
 
-  function selectChip(el, name) {
+  function selectChip(el, name, e) {
+    if (e) e.preventDefault();
     document.querySelectorAll(`[name="${name}"]`).forEach(i => i.closest('.chip').classList.remove('selected'));
     el.classList.add('selected');
+    el.querySelector('input').checked = true;
   }
 
-  function toggleChip(el) {
+  function toggleChip(el, e) {
+    if (e) e.preventDefault();
     el.classList.toggle('selected');
-    const cb = el.querySelector('input[type=checkbox]');
-    cb.checked = el.classList.contains('selected');
+    el.querySelector('input[type=checkbox]').checked = el.classList.contains('selected');
   }
 
-  function selectBudget(el) {
+  function selectBudget(el, e) {
+    if (e) e.preventDefault();
     document.querySelectorAll('.budget-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
+    el.querySelector('input').checked = true;
   }
 
   function addMust() {
