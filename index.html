@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 여행 플래너 요청서</title>
+  <style>
+    :root {
+      --orange: #FF6B35;
+      --orange-light: #FF8C5A;
+      --yellow: #FFD166;
+      --dark: #073B4C;
+      --bg: #FFF8F0;
+      --text: #2D3436;
+      --muted: #636e72;
+      --border: #f0e0d0;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 60px;
+    }
+    .nav-brand { font-weight: 800; font-size: 1rem; color: var(--orange); }
+    .nav-sub { font-size: 0.8rem; color: var(--muted); }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8C5A 40%, #FFD166 100%);
+      color: white; padding: 4rem 2rem 3.5rem; text-align: center; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+    }
+    .hero-badge {
+      display: inline-block; background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 50px; padding: 0.35rem 1rem; font-size: 0.8rem; font-weight: 600; margin-bottom: 1.25rem;
+    }
+    .hero h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900; line-height: 1.2; margin-bottom: 0.75rem; position: relative; }
+    .hero p { font-size: 1rem; opacity: 0.9; position: relative; }
+
+    /* PROGRESS */
+    .progress-bar {
+      background: white; border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem; display: flex; gap: 0; overflow-x: auto;
+    }
+    .step {
+      display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;
+      font-size: 0.78rem; font-weight: 600; color: var(--muted); padding: 0 0.75rem;
+    }
+    .step:first-child { padding-left: 0; }
+    .step-num {
+      width: 24px; height: 24px; border-radius: 50%; background: #f0e8e0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
+    }
+    .step.active .step-num { background: var(--orange); color: white; }
+    .step.active { color: var(--orange); }
+    .step-arrow { color: #ddd; font-size: 0.7rem; margin: 0 0.25rem; }
+
+    /* FORM WRAPPER */
+    .form-wrap { max-width: 760px; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
+
+    /* SECTION CARD */
+    .form-section {
+      background: white; border-radius: var(--radius); padding: 1.75rem;
+      margin-bottom: 1.25rem; border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .section-head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .section-icon { font-size: 1.5rem; }
+    .section-title { font-size: 1rem; font-weight: 800; }
+    .section-sub { font-size: 0.8rem; color: var(--muted); margin-top: 0.1rem; }
+
+    /* FORM ELEMENTS */
+    .field { margin-bottom: 1.25rem; }
+    .field:last-child { margin-bottom: 0; }
+    label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text); }
+    label .req { color: var(--orange); margin-left: 2px; }
+    label .hint { font-weight: 400; color: var(--muted); margin-left: 0.4rem; }
+    input[type=text], input[type=email], input[type=number], select, textarea {
+      width: 100%; padding: 0.65rem 0.9rem; border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 0.9rem; font-family: inherit; color: var(--text);
+      background: #fdfaf7; transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none; -webkit-appearance: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+    }
+    textarea { resize: vertical; min-height: 90px; }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23636e72' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.9rem center; padding-right: 2.5rem; cursor: pointer; }
+
+    /* GRID */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+    /* CHIP SELECT */
+    .chip-group { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.4rem; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      padding: 0.4rem 0.9rem; border-radius: 50px; font-size: 0.82rem; font-weight: 600;
+      border: 1.5px solid var(--border); background: #fdfaf7; cursor: pointer;
+      transition: all 0.15s; user-select: none; color: var(--muted);
+    }
+    .chip:hover { border-color: var(--orange-light); color: var(--orange); }
+    .chip.selected { border-color: var(--orange); background: #fff3ee; color: var(--orange); }
+    .chip input { display: none; }
+
+    /* TRAVELER COUNT */
+    .counter-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .counter-item { display: flex; align-items: center; gap: 0.75rem; background: #fdfaf7; border: 1.5px solid var(--border); border-radius: 10px; padding: 0.5rem 1rem; }
+    .counter-label { font-size: 0.82rem; font-weight: 700; min-width: 60px; }
+    .counter-sub { font-size: 0.7rem; color: var(--muted); display: block; }
+    .counter-btn { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--border); background: white; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--orange); transition: all 0.15s; flex-shrink: 0; }
+    .counter-btn:hover { background: var(--orange); color: white; border-color: var(--orange); }
+    .counter-val { font-size: 1.1rem; font-weight: 800; min-width: 24px; text-align: center; }
+
+    /* BUDGET SLIDER */
+    .budget-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-top: 0.4rem; }
+    .budget-card {
+      border: 2px solid var(--border); border-radius: 12px; padding: 1rem 0.75rem;
+      text-align: center; cursor: pointer; transition: all 0.2s; background: #fdfaf7;
+    }
+    .budget-card:hover { border-color: var(--orange-light); }
+    .budget-card.selected { border-color: var(--orange); background: #fff3ee; }
+    .budget-card input { display: none; }
+    .budget-icon { font-size: 1.5rem; margin-bottom: 0.3rem; }
+    .budget-name { font-size: 0.85rem; font-weight: 800; margin-bottom: 0.2rem; }
+    .budget-range { font-size: 0.72rem; color: var(--muted); }
+
+    /* MUST-VISIT */
+    .must-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .must-item { display: flex; gap: 0.5rem; align-items: center; }
+    .must-item input { flex: 1; }
+    .must-item .del-btn { width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid #ffd6c4; background: #fff3ee; color: var(--orange); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+    .must-item .del-btn:hover { background: var(--orange); color: white; }
+    .add-btn { margin-top: 0.5rem; font-size: 0.82rem; font-weight: 700; color: var(--orange); background: none; border: 1.5px dashed #ffb899; border-radius: 8px; padding: 0.5rem 1rem; cursor: pointer; width: 100%; transition: all 0.2s; }
+    .add-btn:hover { background: #fff3ee; }
+
+    /* SUBMIT */
+    .submit-wrap { margin-top: 1.5rem; text-align: center; }
+    .submit-btn {
+      background: linear-gradient(135deg, var(--orange), var(--orange-light));
+      color: white; border: none; border-radius: 50px; padding: 1rem 3rem;
+      font-size: 1rem; font-weight: 800; cursor: pointer; width: 100%; max-width: 400px;
+      box-shadow: 0 4px 16px rgba(255,107,53,0.4); transition: all 0.2s; letter-spacing: 0.02em;
+    }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,53,0.5); }
+    .submit-note { font-size: 0.78rem; color: var(--muted); margin-top: 0.75rem; }
+
+    /* RESULT MODAL */
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      background: white; border-radius: 20px; padding: 2rem; max-width: 620px; width: 100%;
+      max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .modal-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--orange); }
+    .modal-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .modal-content { background: #fdfaf7; border-radius: 10px; padding: 1.25rem; border: 1px solid var(--border); font-size: 0.85rem; line-height: 1.8; white-space: pre-wrap; font-family: 'SF Mono', 'Consolas', monospace; }
+    .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+    .copy-btn { flex: 1; padding: 0.7rem; border-radius: 10px; border: 1.5px solid var(--orange); background: white; color: var(--orange); font-weight: 700; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+    .copy-btn:hover { background: #fff3ee; }
+    .close-btn { padding: 0.7rem 1.5rem; border-radius: 10px; background: var(--orange); color: white; border: none; font-weight: 700; cursor: pointer; font-size: 0.9rem; }
+
+    @media (max-width: 580px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .budget-cards { grid-template-columns: 1fr; }
+      .counter-row { gap: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">✈️ AI 여행 플래너</div>
+  <div class="nav-sub">요청서 작성 → AI 플래너 생성</div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">🤖 AI 에이전트 팀이 여행 계획을 대신 짜드립니다</div>
+  <h1>나만의 여행 플래너<br/>요청서</h1>
+  <p>아래 항목을 채우면 목적지 분석 · 일정표 · 숙소 · 예산 · 현지 가이드를 한 번에 제공합니다</p>
+</div>
+
+<div class="progress-bar">
+  <div class="step active"><div class="step-num">1</div> 기본 정보</div>
+  <div class="step-arrow">›</div>
+  <div class="step active"><div class="step-num">2</div> 인원 구성</div>
+  <div class="step-arrow">›</div>
+  <div class="step active"><div class="step-num">3</div> 여행 스타일</div>
+  <div class="step-arrow">›</div>
+  <div class="step active"><div class="step-num">4</div> 필수 장소</div>
+  <div class="step-arrow">›</div>
+  <div class="step active"><div class="step-num">5</div> 예산</div>
+  <div class="step-arrow">›</div>
+  <div class="step active"><div class="step-num">6</div> 추가 요청</div>
+</div>
+
+<div class="form-wrap">
+  <form id="plannerForm" onsubmit="generateRequest(event)">
+
+    <!-- SECTION 1: 기본 정보 -->
+    <div class="form-section">
+      <div class="section-head">
+        <div class="section-icon">🗺️</div>
+        <div>
+          <div class="section-title">기본 여행 정보</div>
+          <div class="section-sub">어디로, 언제, 얼마나 가실 건가요?</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>목적지 <span class="req">*</span> <span class="hint">(도시 또는 국가)</span></label>
+        <input type="text" id="destination" placeholder="예: 일본 나고야 / 프랑스 파리 / 베트남 다낭" required />
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>출발 도시 <span class="req">*</span></label>
+          <select id="departure">
+            <option value="">선택하세요</option>
+            <option value="인천국제공항 (ICN)">인천국제공항 (ICN)</option>
+            <option value="김포공항 (GMP)">김포공항 (GMP)</option>
+            <option value="김해공항 (PUS)">김해공항 (PUS)</option>
+            <option value="제주공항 (CJU)">제주공항 (CJU)</option>
+            <option value="청주공항 (CJJ)">청주공항 (CJJ)</option>
+            <option value="대구공항 (TAE)">대구공항 (TAE)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>여행 기간 <span class="req">*</span></label>
+          <select id="duration" required>
+            <option value="">선택하세요</option>
+            <option value="1박 2일">1박 2일</option>
+            <option value="2박 3일">2박 3일</option>
+            <option value="3박 4일">3박 4일</option>
+            <option value="4박 5일">4박 5일</option>
+            <option value="5박 6일">5박 6일</option>
+            <option value="6박 7일">6박 7일</option>
+            <option value="7박 8일">7박 8일</option>
+            <option value="2주 이상">2주 이상</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>희망 출발 시기 <span class="hint">(선택)</span></label>
+          <select id="season">
+            <option value="">미정</option>
+            <option value="2026년 봄 (3~5월)">2026년 봄 (3~5월)</option>
+            <option value="2026년 여름 (6~8월)">2026년 여름 (6~8월)</option>
+            <option value="2026년 가을 (9~11월)">2026년 가을 (9~11월)</option>
+            <option value="2026년 겨울 (12~2월)">2026년 겨울 (12~2월)</option>
+            <option value="날짜 협의">날짜 협의</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>선호 항공편 <span class="hint">(선택)</span></label>
+          <select id="airline">
+            <option value="상관없음">상관없음</option>
+            <option value="LCC 저가항공 우선">LCC 저가항공 우선</option>
+            <option value="대형항공사 우선">대형항공사 우선</option>
+            <option value="직항 필수">직항 필수</option>
+            <option value="마일리지 사용 예정">마일리지 사용 예정</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: 인원 구성 -->
+    <div class="form-section">
+      <div class="section-head">
+        <div class="section-icon">👨‍👩‍👧‍👦</div>
+        <div>
+          <div class="section-title">인원 구성</div>
+          <div class="section-sub">함께 여행하는 분들의 구성을 알려주세요</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>여행 유형 <span class="req">*</span></label>
+        <div class="chip-group" id="travelTypeGroup">
+          <label class="chip" onclick="selectChip(this,'travelType')"><input type="radio" name="travelType" value="혼자 여행 (1인)" />🙋 혼자</label>
+          <label class="chip" onclick="selectChip(this,'travelType')"><input type="radio" name="travelType" value="커플 여행 (2인)" />💑 커플</label>
+          <label class="chip" onclick="selectChip(this,'travelType')"><input type="radio" name="travelType" value="가족 여행" />👨‍👩‍👧 가족</label>
+          <label class="chip" onclick="selectChip(this,'travelType')"><input type="radio" name="travelType" value="친구 여행" />👫 친구</label>
+          <label class="chip" onclick="selectChip(this,'travelType')"><input type="radio" name="travelType" value="단체 여행" />👥 단체</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>인원 수 <span class="req">*</span></label>
+        <div class="counter-row">
+          <div class="counter-item">
+            <div>
+              <span class="counter-label">👨‍👩 성인</span>
+              <span class="counter-sub">만 13세 이상</span>
+            </div>
+            <button type="button" class="counter-btn" onclick="changeCount('adult',-1)">−</button>
+            <span class="counter-val" id="adult-val">2</span>
+            <button type="button" class="counter-btn" onclick="changeCount('adult',1)">+</button>
+          </div>
+          <div class="counter-item">
+            <div>
+              <span class="counter-label">👶 아동</span>
+              <span class="counter-sub">만 2~12세</span>
+            </div>
+            <button type="button" class="counter-btn" onclick="changeCount('child',-1)">−</button>
+            <span class="counter-val" id="child-val">0</span>
+            <button type="button" class="counter-btn" onclick="changeCount('child',1)">+</button>
+          </div>
+          <div class="counter-item">
+            <div>
+              <span class="counter-label">🍼 유아</span>
+              <span class="counter-sub">만 2세 미만</span>
+            </div>
+            <button type="button" class="counter-btn" onclick="changeCount('infant',-1)">−</button>
+            <span class="counter-val" id="infant-val">0</span>
+            <button type="button" class="counter-btn" onclick="changeCount('infant',1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="field" id="elderlyField" style="display:none">
+        <label>어르신 동반 <span class="hint">(만 65세 이상)</span></label>
+        <div class="chip-group" id="elderlyGroup">
+          <label class="chip" onclick="selectChip(this,'elderly')"><input type="radio" name="elderly" value="없음" checked />없음</label>
+          <label class="chip" onclick="selectChip(this,'elderly')"><input type="radio" name="elderly" value="1명" />1명</label>
+          <label class="chip" onclick="selectChip(this,'elderly')"><input type="radio" name="elderly" value="2명 이상" />2명 이상</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: 여행 스타일 -->
+    <div class="form-section">
+      <div class="section-head">
+        <div class="section-icon">🎨</div>
+        <div>
+          <div class="section-title">여행 스타일</div>
+          <div class="section-sub">어떤 여행을 원하시나요? (복수 선택 가능)</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>선호 여행 스타일 <span class="req">*</span><span class="hint">(1~3개 선택)</span></label>
+        <div class="chip-group">
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🏛️ 문화·역사 탐방" />🏛️ 문화·역사</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🍽️ 미식·맛집" />🍽️ 미식·맛집</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🛍️ 쇼핑" />🛍️ 쇼핑</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🎢 테마파크·액티비티" />🎢 테마파크</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🌿 자연·힐링" />🌿 자연·힐링</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="📸 사진·인스타" />📸 포토스팟</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🎭 공연·예술" />🎭 공연·예술</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🏄 스포츠·어드벤처" />🏄 어드벤처</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="😌 휴양·리조트" />😌 휴양</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="style" value="🎓 학습·체험" />🎓 체험·교육</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>여행 페이스 <span class="req">*</span></label>
+        <div class="chip-group" id="paceGroup">
+          <label class="chip" onclick="selectChip(this,'pace')"><input type="radio" name="pace" value="느긋하게 (하루 1~2곳)" />🐢 느긋하게</label>
+          <label class="chip" onclick="selectChip(this,'pace')"><input type="radio" name="pace" value="보통 (하루 3~4곳)" />🚶 보통</label>
+          <label class="chip" onclick="selectChip(this,'pace')"><input type="radio" name="pace" value="알차게 (하루 5곳 이상)" />🏃 알차게</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>숙소 유형 <span class="req">*</span></label>
+        <div class="chip-group" id="accGroup">
+          <label class="chip" onclick="selectChip(this,'acc')"><input type="radio" name="acc" value="호텔 (비즈니스급)" />🏨 비즈니스호텔</label>
+          <label class="chip" onclick="selectChip(this,'acc')"><input type="radio" name="acc" value="호텔 (리조트·4성급 이상)" />⭐ 리조트·특급</label>
+          <label class="chip" onclick="selectChip(this,'acc')"><input type="radio" name="acc" value="에어비앤비·아파트먼트" />🏠 에어비앤비</label>
+          <label class="chip" onclick="selectChip(this,'acc')"><input type="radio" name="acc" value="게스트하우스·호스텔" />🛏️ 게스트하우스</label>
+          <label class="chip" onclick="selectChip(this,'acc')"><input type="radio" name="acc" value="상관없음 (최적 추천)" />🤔 추천받기</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: 필수 방문지 -->
+    <div class="form-section">
+      <div class="section-head">
+        <div class="section-icon">📍</div>
+        <div>
+          <div class="section-title">필수 방문지 & 제외 장소</div>
+          <div class="section-sub">꼭 가고 싶은 곳, 또는 제외할 곳을 알려주세요</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>꼭 가고 싶은 곳 <span class="hint">(없으면 비워도 됩니다)</span></label>
+        <div class="must-list" id="mustList">
+          <div class="must-item">
+            <input type="text" placeholder="예: 레고랜드, 에펠탑, 하롱베이..." />
+            <button type="button" class="del-btn" onclick="removeMust(this)">×</button>
+          </div>
+          <div class="must-item">
+            <input type="text" placeholder="두 번째 필수 장소..." />
+            <button type="button" class="del-btn" onclick="removeMust(this)">×</button>
+          </div>
+        </div>
+        <button type="button" class="add-btn" onclick="addMust()">+ 장소 추가</button>
+      </div>
+
+      <div class="field">
+        <label>제외하고 싶은 것 <span class="hint">(선택)</span></label>
+        <textarea id="excludes" placeholder="예: 박물관류 제외, 너무 걷는 코스 제외, 줄 오래 서는 곳 제외..."></textarea>
+      </div>
+    </div>
+
+    <!-- SECTION 5: 예산 -->
+    <div class="form-section">
+      <div class="section-head">
+        <div class="section-icon">💰</div>
+        <div>
+          <div class="section-title">예산 계획</div>
+          <div class="section-sub">항공 포함 전체 여행 예산 기준 (1인당)</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>예산 수준 <span class="req">*</span></label>
+        <div class="budget-cards">
+          <label class="budget-card" onclick="selectBudget(this)">
+            <input type="radio" name="budget" value="절약형" />
+            <div class="budget-icon">💚</div>
+            <div class="budget-name">절약형</div>
+            <div class="budget-range">가성비 최우선</div>
+          </label>
+          <label class="budget-card" onclick="selectBudget(this)">
+            <input type="radio" name="budget" value="보통형" />
+            <div class="budget-icon">💛</div>
+            <div class="budget-name">보통형</div>
+            <div class="budget-range">합리적 소비</div>
+          </label>
+          <label class="budget-card" onclick="selectBudget(this)">
+            <input type="radio" name="budget" value="럭셔리형" />
+            <div class="budget-icon">💜</div>
+            <div class="budget-name">럭셔리형</div>
+            <div class="budget-range">퀄리티 최우선</div>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>총 예산 (선택) <span class="hint">— 구체적인 금액이 있으면 입력해주세요</span></label>
+        <input type="text" id="budgetAmount" placeholder="예: 4인 기준 총 500만원 / 1인당 150만원" />
+      </div>
+    </div>
+
+    <!-- SECTION 6: 추가 요청 -->
+    <div class="form-section">
+      <div class="section-head">
+        <div class="section-icon">✏️</div>
+        <div>
+          <div class="section-title">추가 요청 & 특별 사항</div>
+          <div class="section-sub">AI 플래너에게 꼭 전달하고 싶은 내용</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>특별 고려 사항 <span class="hint">(복수 선택 가능)</span></label>
+        <div class="chip-group">
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="유모차 이동 가능한 동선" />🍼 유모차 동선</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="어르신 보행 편의 고려" />🧓 어르신 배려</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="채식·비건 식단 필요" />🥗 채식/비건</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="할랄 식단 필요" />🌙 할랄 식단</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="글루텐 프리 필요" />🌾 글루텐 프리</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="반려동물 동반" />🐾 반려동물</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="휠체어·장애인 편의시설 필요" />♿ 접근성</label>
+          <label class="chip" onclick="toggleChip(this)"><input type="checkbox" name="special" value="허니문·기념일 여행" />💍 허니문</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>자유 요청 사항</label>
+        <textarea id="freeRequest" rows="4" placeholder="예: 아이들이 5살, 8살이라 낮잠 시간 꼭 확보해주세요 / 생선류 알레르기 있어요 / 이번이 첫 해외여행이에요 / 사진 찍기 좋은 곳 위주로 넣어주세요..."></textarea>
+      </div>
+
+      <div class="field">
+        <label>연락처 또는 이메일 <span class="hint">(결과 전달용, 선택)</span></label>
+        <input type="email" id="contact" placeholder="example@email.com" />
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button type="submit" class="submit-btn">🤖 AI 플래너 요청서 생성하기</button>
+      <p class="submit-note">입력하신 내용을 바탕으로 Claude AI에게 전달할 요청서가 생성됩니다</p>
+    </div>
+
+  </form>
+</div>
+
+<!-- RESULT MODAL -->
+<div class="modal-backdrop" id="resultModal">
+  <div class="modal">
+    <div class="modal-title">✅ 요청서가 생성되었습니다!</div>
+    <div class="modal-sub">아래 내용을 복사하여 Claude AI에 붙여넣기 하세요</div>
+    <div class="modal-content" id="resultText"></div>
+    <div class="modal-actions">
+      <button class="copy-btn" onclick="copyResult()">📋 클립보드에 복사</button>
+      <button class="close-btn" onclick="closeModal()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const counts = { adult: 2, child: 0, infant: 0 };
+
+  function changeCount(type, delta) {
+    counts[type] = Math.max(0, counts[type] + delta);
+    if (type === 'adult') counts[type] = Math.max(1, counts[type]);
+    document.getElementById(type + '-val').textContent = counts[type];
+  }
+
+  function selectChip(el, name) {
+    document.querySelectorAll(`[name="${name}"]`).forEach(i => i.closest('.chip').classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function toggleChip(el) {
+    el.classList.toggle('selected');
+    const cb = el.querySelector('input[type=checkbox]');
+    cb.checked = el.classList.contains('selected');
+  }
+
+  function selectBudget(el) {
+    document.querySelectorAll('.budget-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function addMust() {
+    const list = document.getElementById('mustList');
+    const item = document.createElement('div');
+    item.className = 'must-item';
+    item.innerHTML = `<input type="text" placeholder="방문하고 싶은 장소..." /><button type="button" class="del-btn" onclick="removeMust(this)">×</button>`;
+    list.appendChild(item);
+    item.querySelector('input').focus();
+  }
+
+  function removeMust(btn) {
+    const list = document.getElementById('mustList');
+    if (list.children.length > 1) btn.closest('.must-item').remove();
+    else btn.closest('.must-item').querySelector('input').value = '';
+  }
+
+  function generateRequest(e) {
+    e.preventDefault();
+
+    const destination = document.getElementById('destination').value;
+    const departure = document.getElementById('departure').value || '인천국제공항';
+    const duration = document.getElementById('duration').value;
+    const season = document.getElementById('season').value || '미정';
+    const airline = document.getElementById('airline').value;
+
+    const travelType = document.querySelector('[name="travelType"]:checked')?.value || '미지정';
+    const adultCount = counts.adult;
+    const childCount = counts.child;
+    const infantCount = counts.infant;
+
+    const styles = [...document.querySelectorAll('[name="style"]:checked')].map(i => i.value);
+    const pace = document.querySelector('[name="pace"]:checked')?.value || '보통';
+    const acc = document.querySelector('[name="acc"]:checked')?.value || '상관없음';
+
+    const mustPlaces = [...document.querySelectorAll('#mustList input')].map(i => i.value).filter(v => v.trim());
+    const excludes = document.getElementById('excludes').value;
+
+    const budget = document.querySelector('[name="budget"]:checked')?.value || '보통형';
+    const budgetAmount = document.getElementById('budgetAmount').value;
+
+    const specials = [...document.querySelectorAll('[name="special"]:checked')].map(i => i.value);
+    const freeRequest = document.getElementById('freeRequest').value;
+    const contact = document.getElementById('contact').value;
+
+    const memberStr = [
+      adultCount > 0 ? `성인 ${adultCount}명` : '',
+      childCount > 0 ? `아동 ${childCount}명` : '',
+      infantCount > 0 ? `유아 ${infantCount}명` : ''
+    ].filter(Boolean).join(' + ');
+
+    const result = `# ✈️ AI 여행 플래너 요청서
+
+## 📋 기본 정보
+- 목적지: ${destination}
+- 출발지: ${departure}
+- 여행 기간: ${duration}
+- 희망 시기: ${season}
+- 선호 항공: ${airline}
+
+## 👥 인원 구성
+- 여행 유형: ${travelType}
+- 인원: ${memberStr} (총 ${adultCount + childCount + infantCount}명)
+
+## 🎨 여행 스타일
+- 선호 스타일: ${styles.length > 0 ? styles.join(', ') : '미지정'}
+- 여행 페이스: ${pace}
+- 숙소 유형: ${acc}
+
+## 📍 필수 방문지
+${mustPlaces.length > 0 ? mustPlaces.map((p, i) => `${i + 1}. ${p}`).join('\n') : '- 없음 (AI가 추천)'}
+${excludes ? `\n제외 사항: ${excludes}` : ''}
+
+## 💰 예산
+- 예산 수준: ${budget}
+${budgetAmount ? `- 구체적 예산: ${budgetAmount}` : ''}
+
+## ✏️ 특별 요청
+${specials.length > 0 ? specials.map(s => `- ${s}`).join('\n') : '- 없음'}
+${freeRequest ? `\n자유 요청:\n${freeRequest}` : ''}
+${contact ? `\n연락처: ${contact}` : ''}
+
+---
+위 요청을 바탕으로 다음 산출물을 생성해주세요:
+1. 목적지 분석 보고서 (관광지·입국요건·안전·날씨)
+2. 일별 상세 일정표 (시간대별 동선 최적화)
+3. 숙소 추천 가이드 (지역·유형·가격대)
+4. 예산 계획서 (절약형/보통형/럭셔리형 3단계)
+5. 현지 정보 가이드 (교통·맛집·에티켓·긴급연락처)`;
+
+    document.getElementById('resultText').textContent = result;
+    document.getElementById('resultModal').classList.add('show');
+  }
+
+  function copyResult() {
+    const text = document.getElementById('resultText').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = '✅ 복사됨!';
+      setTimeout(() => btn.textContent = '📋 클립보드에 복사', 2000);
+    });
+  }
+
+  function closeModal() {
+    document.getElementById('resultModal').classList.remove('show');
+  }
+
+  document.getElementById('resultModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+</script>
+</body>
+</html>
